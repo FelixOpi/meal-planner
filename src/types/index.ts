@@ -47,4 +47,24 @@ export interface ShoppingListOptimization {
   preferredStores: string[];
   budgetLimit?: number;
   organicPreference: boolean;
+}
+
+export interface UserPreferences {
+  excludedIngredients: string[];
+  servings: number;
+  // ... andere Präferenzen
+}
+
+export interface Recipe {
+  name: string;
+  description: string;
+  ingredients: {
+    name: string;
+    amount: number;
+    unit: string;
+  }[];
+  instructions: string[];
+  preparationTime: number;
+  servings: number;
+  dietaryInfo?: string[];
 } 

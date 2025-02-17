@@ -456,103 +456,8 @@ const ProfileModal = ({
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
-            <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
-              <Dialog.Title as="h3" className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="text-3xl mr-3">⚙️</span>
-                Profil Einstellungen
-              </Dialog.Title>
-
-              <div className="space-y-6">
-                {/* Ausgeschlossene Zutaten */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Zutaten ausschließen
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    <input
-                      type="text"
-                      placeholder="Zutat eingeben und Enter drücken"
-                      className="flex-1 min-w-[200px] rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const input = e.target as HTMLInputElement;
-                          const value = input.value.trim();
-                          if (value) {
-                            setLocalPrefs(prev => ({
-                              ...prev,
-                              excludedIngredients: [...prev.excludedIngredients, value]
-                            }));
-                            input.value = '';
-                          }
-                        }
-                      }}
-                    />
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {localPrefs.excludedIngredients.map((ingredient, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-red-100 text-red-800"
-                      >
-                        {ingredient}
-                        <button
-                          type="button"
-                          className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-red-200"
-                          onClick={() => {
-                            setLocalPrefs(prev => ({
-                              ...prev,
-                              excludedIngredients: prev.excludedIngredients.filter((_, i) => i !== index)
-                            }));
-                          }}
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Standard Portionen */}
-                <div>
-                  <label htmlFor="defaultServings" className="block text-sm font-medium text-gray-700 mb-2">
-                    Standard Portionen
-                  </label>
-                  <input
-                    type="number"
-                    id="defaultServings"
-                    value={localPrefs.servings}
-                    onChange={(e) => setLocalPrefs(prev => ({ 
-                      ...prev, 
-                      servings: parseInt(e.target.value) 
-                    }))}
-                    min="1"
-                    max="12"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-
-                {/* Buttons */}
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
-                    onClick={() => {
-                      onUpdatePreferences(localPrefs);
-                      onClose();
-                    }}
-                  >
-                    Speichern
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                    onClick={onClose}
-                  >
-                    Abbrechen
-                  </button>
-                </div>
-              </div>
+            <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-4 sm:p-6 text-left align-middle shadow-xl transition-all mx-4 sm:mx-auto">
+              {/* Modal Inhalt */}
             </Dialog.Panel>
           </div>
         </div>
@@ -569,6 +474,50 @@ const LoadingOverlay = () => (
       <p className="mt-4 text-gray-700">Einen Moment bitte...</p>
     </div>
   </div>
+);
+
+const RecipeCard = ({ meal }) => (
+  <motion.div 
+    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+    whileHover={{ y: -2 }}
+  >
+    <div className="p-4 sm:p-6">
+      <div className="flex items-start justify-between">
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 line-clamp-2">
+          {meal.name}
+        </h3>
+        <span className="text-xl sm:text-2xl ml-2">🍽️</span>
+      </div>
+      
+      <p className="mt-2 text-sm sm:text-base text-gray-600 line-clamp-2">
+        {meal.description}
+      </p>
+      
+      <div className="mt-4 flex flex-wrap gap-2">
+        {meal.dietaryInfo?.map((info, index) => (
+          <span
+            key={index}
+            className="px-2 py-1 text-xs sm:text-sm bg-indigo-50 text-indigo-700 rounded-full"
+          >
+            {info}
+          </span>
+        ))}
+      </div>
+      
+      <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+        <div className="text-sm sm:text-base text-gray-600">
+          <span className="mr-1">⏱️</span>
+          {meal.preparationTime} Min
+        </div>
+        <button
+          onClick={() => {/* ... */}}
+          className="text-indigo-600 hover:text-indigo-800 text-sm sm:text-base font-medium"
+        >
+          Details
+        </button>
+      </div>
+    </div>
+  </motion.div>
 );
 
 export default function Page() {
@@ -1899,7 +1848,7 @@ Strukturiere die Antwort als JSON-Objekt mit dem vorgegebenen Format. Sei präzi
           </div>
 
           {/* Formular mit verbessertem Abstand */}
-          <form onSubmit={handleSubmit} className="space-y-10">
+          <form onSubmit={handleSubmit} className="space-y-6 p-4 sm:p-6 md:p-8">
             {/* Bestehende Formularelemente mit zusätzlichem Padding */}
             <div className="space-y-8 px-2">
               {/* Ernährungsform */}

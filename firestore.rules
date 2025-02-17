@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Hilfsfunktionen
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Benutzer und alle Subkollektionen
+    match /users/{userId}/{document=**} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Öffentliche Rezepte
+    match /meals/{mealId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+      
+      // Bewertungen und Kommentare
+      match /{collection}/{docId} {
+        allow read: if true;
+        allow create: if isAuthenticated();
+        allow update, delete: if isAuthenticated() && 
+          resource.data.userId == request.auth.uid;
+      }
+    }
+
+    // Öffentliche Daten
+    match /{path=**}/public/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+} 

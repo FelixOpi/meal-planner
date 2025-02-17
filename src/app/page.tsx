@@ -415,56 +415,191 @@ const RecipeSuggestionsModal = ({
   </Transition>
 );
 
-// Entferne das ProfileModal aus der Page-Komponente und erstelle es als separate Komponente
-const ProfileModal = ({ 
-  isOpen, 
-  onClose, 
-  preferences, 
-  onUpdatePreferences 
-}: { 
-  isOpen: boolean;
-  onClose: () => void;
-  preferences: UserPreferences;
-  onUpdatePreferences: (prefs: UserPreferences) => void;
-}) => {
-  // Lokaler State für die Einstellungen
-  const [localPrefs, setLocalPrefs] = useState<UserPreferences>(preferences);
-
-  // Aktualisiere lokale Einstellungen wenn sich die Props ändern
-  useEffect(() => {
-    setLocalPrefs(preferences);
-  }, [preferences]);
-
-  return (
-    <Transition appear show={isOpen} as={Fragment}>
-      <Dialog 
-        as="div" 
-        className="relative z-10" 
-        onClose={onClose}
+// ProfileModal
+const ProfileModal = ({ isOpen, onClose, preferences, onUpdatePreferences }) => (
+  <Transition appear show={isOpen} as={Fragment}>
+    <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Transition.Child
+        as={Fragment}
+        enter="ease-out duration-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="ease-in duration-200"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
       >
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm" />
-        </Transition.Child>
+        <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm" />
+      </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-4 sm:p-6 text-left align-middle shadow-xl transition-all mx-4 sm:mx-auto">
-              {/* Modal Inhalt */}
-            </Dialog.Panel>
-          </div>
+      <div className="fixed inset-0 overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all mx-4">
+            <Dialog.Title as="h3" className="text-lg sm:text-xl font-semibold leading-6 text-gray-900 flex items-center">
+              <span className="text-xl sm:text-2xl mr-2">⚙️</span>
+              Einstellungen
+            </Dialog.Title>
+
+            <div className="mt-4 space-y-4">
+              {/* Ausgeschlossene Zutaten */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Zutaten ausschließen
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    type="text"
+                    placeholder="Zutat + Enter"
+                    className="w-full rounded-lg border-gray-300 text-sm"
+                    onKeyDown={(e) => {/* ... */}}
+                  />
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {preferences.excludedIngredients.map((ingredient, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs sm:text-sm bg-red-100 text-red-800"
+                    >
+                      {ingredient}
+                      <button
+                        type="button"
+                        className="ml-1.5 text-red-600 hover:text-red-800"
+                        onClick={() => {/* ... */}}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Portionen */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Standard Portionen
+                </label>
+                <select
+                  value={preferences.servings}
+                  onChange={(e) => {/* ... */}}
+                  className="w-full rounded-lg border-gray-300 text-sm"
+                >
+                  {[1,2,3,4,5,6].map(num => (
+                    <option key={num} value={num}>{num}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Buttons */}
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <button
+                  type="button"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                  onClick={() => {
+                    onUpdatePreferences(preferences);
+                    onClose();
+                  }}
+                >
+                  Speichern
+                </button>
+                <button
+                  type="button"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  onClick={onClose}
+                >
+                  Abbrechen
+                </button>
+              </div>
+            </div>
+          </Dialog.Panel>
         </div>
-      </Dialog>
-    </Transition>
-  );
-};
+      </div>
+    </Dialog>
+  </Transition>
+);
+
+// RecipeModal
+const RecipeModal = ({ isOpen, onClose, recipe }) => (
+  <Transition appear show={isOpen} as={Fragment}>
+    <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Transition.Child
+        as={Fragment}
+        enter="ease-out duration-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="ease-in duration-200"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm" />
+      </Transition.Child>
+
+      <div className="fixed inset-0 overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center p-4">
+          <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all mx-4">
+            <div className="relative">
+              {/* Header */}
+              <div className="p-6 pb-4 border-b">
+                <Dialog.Title as="h3" className="text-lg sm:text-xl font-semibold text-gray-900">
+                  {recipe.name}
+                </Dialog.Title>
+                <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                {/* Zutaten */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Zutaten</h4>
+                  <ul className="space-y-2">
+                    {recipe.ingredients.map((ingredient, index) => (
+                      <li key={index} className="flex items-center text-sm sm:text-base">
+                        <span className="mr-2">•</span>
+                        {ingredient.amount} {ingredient.unit} {ingredient.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Anleitung */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Zubereitung</h4>
+                  <ol className="space-y-3">
+                    {recipe.instructions.map((step, index) => (
+                      <li key={index} className="flex text-sm sm:text-base">
+                        <span className="font-medium mr-2">{index + 1}.</span>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-6 pt-4 border-t bg-gray-50">
+                <div className="flex flex-wrap gap-4 justify-between items-center">
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm text-gray-600">⏱️ {recipe.preparationTime} Min</span>
+                    <span className="text-sm text-gray-600">👥 {recipe.servings} Portionen</span>
+                  </div>
+                  <button
+                    onClick={onClose}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Schließen
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </div>
+    </Dialog>
+  </Transition>
+);
 
 // Füge einen LoadingOverlay hinzu
 const LoadingOverlay = () => (

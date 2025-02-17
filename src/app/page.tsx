@@ -476,7 +476,16 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const RecipeCard = ({ meal }) => (
+interface RecipeCardProps {
+  meal: {
+    name: string;
+    description: string;
+    dietaryInfo?: string[];
+    preparationTime: string | number;
+  }
+}
+
+const RecipeCard = ({ meal }: RecipeCardProps) => (
   <motion.div 
     className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
     whileHover={{ y: -2 }}
